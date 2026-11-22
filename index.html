@@ -728,11 +728,53 @@
         }
 
         const musicBox = new BirthdayMusicBox();
-        function toggleMusic() {
-            const playing = musicBox.toggle();
+        function updateMusicUI(playing) {
             document.getElementById('musicStatusText').innerText = playing ? "Playing 🎵" : "Music";
             document.getElementById('musicIcon').className = playing ? "w-3.5 h-3.5 text-rosepink-500 animate-spin" : "w-3.5 h-3.5 text-rosepink-500";
         }
+
+        function toggleMusic() {
+            const playing = musicBox.toggle();
+            updateMusicUI(playing);
+        }
+
+        // Autoplay birthday melody on page load (with first-tap unlock for mobile browsers)
+        let userToggledMusic = false;
+        document.getElementById('musicToggleBtn').addEventListener('click', () => {
+            userToggledMusic = true;
+        }, { capture: true });
+
+        function startBirthdayMusicAuto() {
+            if (userToggledMusic) return;
+            musicBox.init();
+            if (musicBox.audioCtx.state === 'suspended') {
+                musicBox.audioCtx.resume().then(() => {
+                    if (!musicBox.isPlaying && !userToggledMusic) {
+                        musicBox.isPlaying = true;
+                        musicBox.playMelody();
+                        updateMusicUI(true);
+                    }
+                }).catch(() => {});
+            } else if (!musicBox.isPlaying) {
+                musicBox.isPlaying = true;
+                musicBox.playMelody();
+                updateMusicUI(true);
+            }
+        }
+
+        window.addEventListener('load', () => {
+            startBirthdayMusicAuto();
+            // Fallback unlock on first tap/click anywhere if browser blocks immediate autoplay
+            const unlockOnFirstTap = () => {
+                startBirthdayMusicAuto();
+                if (musicBox.audioCtx && musicBox.audioCtx.state === 'running') {
+                    document.removeEventListener('pointerdown', unlockOnFirstTap);
+                    document.removeEventListener('keydown', unlockOnFirstTap);
+                }
+            };
+            document.addEventListener('pointerdown', unlockOnFirstTap);
+            document.addEventListener('keydown', unlockOnFirstTap);
+        });
 
         /* Floating background hearts canvas */
         const canvas = document.getElementById('heartCanvas');
