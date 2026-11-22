@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full overflow-hidden">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Birthday Sidiksha! (Jaanu) ✨</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sacramento&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        rosepink: {
+                            50: '#fff1f2',
+                            100: '#ffe4e6',
+                            200: '#fecdd3',
+                            300: '#fda4af',
+                            400: '#fb7185',
+                            500: '#f43f5e',
+                            600: '#e11d48',
+                            700: '#be123c',
+                            900: '#881337',
+                        },
+                        rosegold: '#e0a96d',
+                        warmcream: '#fffdfa',
+                        softpeach: '#fff3eb',
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        cursive: ['"Dancing Script"', 'cursive'],
+                        handwriting: ['"Sacramento"', 'cursive'],
+                        polaroid: ['"Caveat"', 'cursive'],
+                    },
+                    animation: {
+                        'float': 'float 3.5s ease-in-out infinite',
+                        'pulse-slow': 'pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'flame': 'flame 1.2s ease-in-out infinite alternate',
+                        'pop-in': 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        flame: {
+                            '0%': { transform: 'scale(1) rotate(-2deg)', opacity: '0.95' },
+                            '100%': { transform: 'scale(1.2) rotate(2deg)', opacity: '1' },
+                        },
+                        popIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.8) translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Strict Mobile Viewport Fix */
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            overflow: hidden;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+
+        .polaroid-shadow {
+            box-shadow: 0 14px 32px -8px rgba(225, 29, 72, 0.22), 0 6px 12px -2px rgba(0, 0, 0, 0.08);
+        }
+
+        .step-screen {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease-in-out;
+            will-change: transform, opacity;
+        }
+
+        .step-hidden-next {
+            transform: translateX(100%) scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .step-hidden-prev {
+            transform: translateX(-100%) scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .step-active {
+            transform: translateX(0) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Candle Flame Effect */
+        .flame-inner {
+            background: radial-gradient(ellipse at bottom, #fff 0%, #ffeb3b 40%, #ff9800 100%);
+            box-shadow: 0 0 14px #ff9800, 0 0 24px #ff5722;
+        }
+
+        .blown-out .flame-inner {
+            display: none;
+        }
+
+        .blown-out .smoke {
+            opacity: 0.8;
+            transform: translateY(-24px) scale(2.2);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-gray-800 font-sans h-full w-full flex items-center justify-center p-0 md:p-4">
+
+    <!-- FLOATING BACKGROUND CANVAS FOR HEARTS -->
+    <canvas id="heartCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-40"></canvas>
+
+    <!-- MOBILE CONTAINER FRAME (100% Fullscreen on Mobile, 480px Centered Frame on Desktop) -->
+    <main class="w-full max-w-[480px] h-full h-[100dvh] bg-gradient-to-br from-rosepink-50 via-softpeach to-warmcream relative overflow-hidden flex flex-col shadow-2xl md:rounded-[36px] md:border-[6px] md:border-slate-800 z-10">
+
+        <!-- HEADER / TOP NAVIGATION & MUSIC TOGGLE -->
+        <header class="pt-4 px-5 pb-3 flex items-center justify-between z-40 bg-white/40 backdrop-blur-md border-b border-rosepink-100/60 shrink-0">
+            <!-- Step Indicator -->
+            <div class="flex items-center space-x-2">
+                <div class="flex items-center space-x-1" id="stepDots">
+                    <!-- Dynamic Dots generated by JS -->
+                </div>
+                <span id="stepCounterText" class="text-xs font-bold text-rosepink-600 ml-1">Step 1/5</span>
+            </div>
+
+            <!-- Music Box Toggle -->
+            <button id="musicToggleBtn" onclick="toggleMusic()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-white/80 border border-rosepink-200 shadow-sm hover:bg-white transition-all text-rosepink-600 text-xs font-semibold">
+                <i data-lucide="music" id="musicIcon" class="w-3.5 h-3.5 text-rosepink-500"></i>
+                <span id="musicStatusText">Music</span>
+            </button>
+        </header>
+
+        <!-- DYNAMIC STEP STACK CONTAINER (Zero Vertical Scroll) -->
+        <div class="relative flex-1 w-full h-full overflow-hidden">
+
+            <!-- ==========================================
+                 STEP 1: GIFT UNBOXING REVEAL
+                 ========================================== -->
+            <section id="step-1" class="step-screen step-active absolute inset-0 p-6 flex flex-col items-center justify-between text-center">
+                
+                <div class="pt-4 space-y-2">
+                    <span class="px-3.5 py-1 rounded-full bg-rosepink-100 text-rosepink-600 text-xs font-semibold uppercase tracking-wider shadow-sm inline-block">
+                        Special Surprise 🎁
+                    </span>
+                    <h1 class="text-2xl font-extrabold text-gray-900 tracking-tight">For Jaanu 💝</h1>
+                    <p class="text-xs text-gray-500 max-w-xs mx-auto">Tap the glowing gift box below to open your birthday surprise!</p>
+                </div>
+
+                <!-- Animated Interactive Gift Box -->
+                <div class="my-auto cursor-pointer group relative" onclick="openGift()">
+                    <div class="absolute inset-0 bg-rosepink-300/60 rounded-full blur-3xl scale-125 animate-pulse-slow"></div>
+                    
+                    <div id="giftBox" class="relative z-10 animate-float transition-transform duration-300 group-hover:scale-105">
+                        <svg class="w-48 h-48 drop-shadow-2xl mx-auto" viewBox="0 0 100 100" fill="none">
+                            <rect x="15" y="40" width="70" height="50" rx="10" fill="url(#gift-grad)" />
+                            <rect x="43" y="40" width="14" height="50" fill="#E0A96D" />
+                            <g id="giftLid" class="transition-transform duration-700 origin-top">
+                                <rect x="10" y="25" width="80" height="17" rx="5" fill="#F43F5E" />
+                                <rect x="43" y="25" width="14" height="17" fill="#E0A96D" />
+                                <path d="M35 15C35 8 42 6 50 16C58 6 65 8 65 15C65 23 50 25 50 25C50 25 35 23 35 15Z" fill="#E0A96D" />
+                                <circle cx="50" cy="21" r="3.5" fill="#FBBF24" />
+                            </g>
+                            <defs>
+                                <linearGradient id="gift-grad" x1="15" y1="40" x2="85" y2="90" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#FB7185" />
+                                    <stop offset="1" stop-color="#E11D48" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
+
+                    <div class="mt-4 inline-flex items-center space-x-1.5 px-4 py-2 rounded-full bg-white/90 shadow-md text-rosepink-600 font-bold text-xs animate-bounce border border-rosepink-200">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-rosegold"></i>
+                        <span>Tap Present To Open!</span>
+                    </div>
+                </div>
+
+                <!-- Step 1 Unlocked Hero Banner -->
+                <div id="step1Success" class="hidden w-full space-y-3 pb-3 animate-pop-in">
+                    <div class="glass-card rounded-2xl p-3.5 border border-rosepink-200 space-y-2.5">
+                        <div class="relative w-44 h-52 mx-auto rounded-xl overflow-hidden border-2 border-white shadow-md bg-rosepink-50/80 flex items-center justify-center">
+                            <img src="WhatsApp%20Image%202026-11-22%20at%202.24.14%20PM.jpeg" alt="Sidiksha Saree" class="w-full h-full object-contain" onerror="this.src='WhatsApp Image 2026-11-22 at 2.24.14 PM.jpeg';">
+                        </div>
+                        <h2 class="text-2xl font-bold font-cursive text-rosepink-600 leading-tight">
+                            Happy Birthday Sidiksha! ✨
+                        </h2>
+                        <p class="text-xs text-gray-700 font-medium">
+                            (aka my cutest <span class="text-rosepink-600 font-bold">Dadi Ji 👵❤️</span>)
+                        </p>
+                        <p class="text-[11px] text-gray-500 font-light">
+                            Here is a tiny digital memory lane made with all my love just for you!
+                        </p>
+                    </div>
+
+                    <button onclick="goToStep(2)" class="w-full py-3.5 bg-gradient-to-r from-rosepink-500 to-rosepink-600 hover:from-rosepink-600 hover:to-rosepink-700 text-white font-bold rounded-2xl shadow-lg shadow-rosepink-500/30 flex items-center justify-center space-x-2 text-sm active:scale-98 transition-all">
+                        <span>See Your Photos 📸</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+            </section>
+
+
+            <!-- ==========================================
+                 STEP 2: SIDIKSHA'S POLAROID PHOTO STACK
+                 ========================================== -->
+            <section id="step-2" class="step-screen step-hidden-next absolute inset-0 p-5 flex flex-col items-center justify-between text-center">
+                
+                <div class="space-y-1">
+                    <span class="px-3.5 py-1 rounded-full bg-rosepink-100 text-rosepink-600 text-xs font-semibold uppercase tracking-wider inline-block">
+                        Moments of Jaanu 📸
+                    </span>
+                    <h2 class="text-xl font-bold text-gray-900">Your Photo Deck</h2>
+                    <p class="text-xs text-gray-500">Tap each card to slide through your special photos!</p>
+                </div>
+
+                <!-- POLAROID STACK CONTAINER -->
+                <div class="relative w-full max-w-[330px] h-[400px] my-auto flex items-center justify-center">
+                    
+                    <!-- Polaroid 3 (Bottom - Nose ring close-up) -->
+                    <div id="polaroid-3" class="polaroid-card polaroid-shadow absolute inset-0 bg-white p-3.5 rounded-2xl border border-gray-100 flex flex-col transition-all duration-500 transform rotate-3 scale-95 cursor-pointer" onclick="nextPolaroid(3)">
+                        <div class="relative w-full h-[280px] rounded-xl overflow-hidden bg-rosepink-50/80 border border-gray-100 flex items-center justify-center">
+                            <img src="WhatsApp%20Image%202026-11-22%20at%202.24.15%20PM%20(1).jpeg" alt="Sidiksha Nathni" class="w-full h-full object-contain" onerror="this.src='WhatsApp Image 2026-11-22 at 2.24.15 PM (1).jpeg';">
+                            <span class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full backdrop-blur-sm">3 of 3</span>
+                        </div>
+                        <div class="pt-2.5 text-center">
+                            <h3 class="font-polaroid text-2xl font-bold text-gray-800 leading-tight">That smileeee 😍🫶</h3>
+                        </div>
+                    </div>
+
+                    <!-- Polaroid 2 (Middle - Vintage sideways portrait rotated upright) -->
+                    <div id="polaroid-2" class="polaroid-card polaroid-shadow absolute inset-0 bg-white p-3.5 rounded-2xl border border-gray-100 flex flex-col transition-all duration-500 transform -rotate-2 scale-98 cursor-pointer" onclick="nextPolaroid(2)">
+                        <div class="relative w-full h-[280px] rounded-xl overflow-hidden bg-rosepink-50/80 border border-gray-100 flex items-center justify-center">
+                            <!-- Rotated -90deg counter-clockwise so her face stands upright and full photo stays visible -->
+                            <img src="WhatsApp%20Image%202026-11-22%20at%202.24.15%20PM.jpeg" alt="Sidiksha Portrait" class="w-[280px] h-[330px] object-contain transform -rotate-90" onerror="this.src='WhatsApp Image 2026-11-22 at 2.24.15 PM.jpeg';">
+                            <span class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full backdrop-blur-sm z-10">2 of 3</span>
+                        </div>
+                        <div class="pt-2.5 text-center">
+                            <h3 class="font-polaroid text-2xl font-bold text-gray-800 leading-tight">Timeless beauty, Jaanu 🌸✨</h3>
+                        </div>
+                    </div>
+
+                    <!-- Polaroid 1 (Top - Pout angry cap selfie) -->
+                    <div id="polaroid-1" class="polaroid-card polaroid-shadow absolute inset-0 bg-white p-3.5 rounded-2xl border border-gray-100 flex flex-col transition-all duration-500 transform rotate-2 cursor-pointer" onclick="nextPolaroid(1)">
+                        <div class="relative w-full h-[280px] rounded-xl overflow-hidden bg-rosepink-50/80 border border-gray-100 flex items-center justify-center">
+                            <img src="WhatsApp%20Image%202026-11-22%20at%202.24.14%20PM%20(1).jpeg" alt="Sidiksha Cute Pout" class="w-full h-full object-contain" onerror="this.src='WhatsApp Image 2026-11-22 at 2.24.14 PM (1).jpeg';">
+                            <span class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full backdrop-blur-sm">1 of 3 • Tap Card</span>
+                        </div>
+                        <div class="pt-2.5 text-center">
+                            <h3 class="font-polaroid text-2xl font-bold text-gray-800 leading-tight">Even angry looks so cute 💢🥺</h3>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Next Stage Action Button -->
+                <div class="w-full pb-3">
+                    <button id="step2NextBtn" onclick="goToStep(3)" class="w-full py-3.5 bg-gradient-to-r from-rosepink-500 to-rosepink-600 hover:from-rosepink-600 hover:to-rosepink-700 text-white font-bold rounded-2xl shadow-lg shadow-rosepink-500/30 flex items-center justify-center space-x-2 text-sm opacity-50 pointer-events-none transition-all">
+                        <span id="step2BtnText">View All Photos First 📸</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+            </section>
+
+
+            <!-- ==========================================
+                 STEP 3: BICEP HEART PHOTO PLACEHOLDER
+                 ========================================== -->
+            <section id="step-3" class="step-screen step-hidden-next absolute inset-0 p-5 flex flex-col items-center justify-between text-center">
+
+                <div class="space-y-1">
+                    <span class="px-3.5 py-1 rounded-full bg-rosepink-100 text-rosepink-600 text-xs font-semibold uppercase tracking-wider inline-block">
+                        Special Flex 💪❤️
+                    </span>
+                    <h2 class="text-xl font-bold text-gray-900">Heart Out Of Bicep</h2>
+                    <p class="text-xs text-gray-500">Reserved spot for your bicep heart photo link!</p>
+                </div>
+
+                <!-- Reserved Photo Slot for Bicep Heart Link -->
+                <div class="w-full max-w-[330px] h-[360px] my-auto glass-card rounded-2xl p-4 border-2 border-dashed border-rosepink-300 flex flex-col items-center justify-center space-y-3 shadow-lg">
+                    <!-- Replace src below with your bicep heart image link when ready -->
+                    <img id="bicepHeartPhoto" src="" alt="Bicep Heart Photo" class="hidden w-full h-full object-contain rounded-xl" onload="this.classList.remove('hidden'); document.getElementById('bicepPlaceholderContent').classList.add('hidden');" onerror="this.classList.add('hidden'); document.getElementById('bicepPlaceholderContent').classList.remove('hidden');">
+
+                    <div id="bicepPlaceholderContent" class="flex flex-col items-center justify-center space-y-2.5 px-3">
+                        <div class="w-16 h-16 rounded-full bg-rosepink-100 text-rosepink-600 flex items-center justify-center shadow-sm">
+                            <i data-lucide="heart-handshake" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="font-polaroid text-2xl font-bold text-gray-800">Bicep Heart Photo Coming Soon 💪🫶</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed">
+                            Photo spot saved right here—drop your bicep heart photo link whenever you're ready to plug it in!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Next Stage Action Button -->
+                <div class="w-full pb-3">
+                    <button id="step3NextBtn" onclick="goToStep(4)" class="w-full py-3.5 bg-gradient-to-r from-rosepink-500 to-rosepink-600 hover:from-rosepink-600 hover:to-rosepink-700 text-white font-bold rounded-2xl shadow-lg shadow-rosepink-500/30 flex items-center justify-center space-x-2 text-sm active:scale-98 transition-all">
+                        <span>Read Your Letter 💌</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+            </section>
+
+
+            <!-- ==========================================
+                 STEP 4: WAX-SEALED LOVE LETTER
+                 ========================================== -->
+            <section id="step-4" class="step-screen step-hidden-next absolute inset-0 p-5 flex flex-col items-center justify-between text-center">
+                
+                <div class="space-y-1">
+                    <span class="px-3.5 py-1 rounded-full bg-rosepink-100 text-rosepink-600 text-xs font-semibold uppercase tracking-wider inline-block">
+                        Personal Note ✉️
+                    </span>
+                    <h2 class="text-xl font-bold text-gray-900">Sealed Love Letter</h2>
+                    <p class="text-xs text-gray-500">Tap the crimson heart wax seal to open your letter!</p>
+                </div>
+
+                <!-- ENVELOPE & LETTER DISPLAY CONTAINER -->
+                <div class="w-full max-w-[330px] my-auto relative">
+                    
+                    <!-- CLOSED ENVELOPE WITH WAX SEAL -->
+                    <div id="envelopeWrapper" class="relative w-full aspect-[4/3] bg-rosepink-100 rounded-2xl border-2 border-rosepink-200 shadow-xl flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-102" onclick="openLetter()">
+                        <div class="absolute inset-0 bg-rosepink-200/50 rounded-2xl pointer-events-none"></div>
+                        
+                        <!-- Wax Seal Button -->
+                        <div id="waxSeal" class="relative z-20 w-16 h-16 rounded-full bg-rosepink-700 border-2 border-rosegold shadow-lg flex items-center justify-center text-rosegold animate-pulse">
+                            <i data-lucide="heart" class="w-7 h-7 fill-rosegold"></i>
+                        </div>
+                        <p class="text-[11px] text-rosepink-700 font-bold mt-2 z-20">For Sidiksha (Jaanu) 💖</p>
+                    </div>
+
+                    <!-- OPEN LETTER DISPLAY CARD -->
+                    <div id="letterCard" class="hidden glass-card rounded-2xl p-5 text-left border border-rosepink-200 shadow-2xl space-y-3 relative overflow-hidden animate-pop-in">
+                        <div class="flex justify-between items-center border-b border-rosepink-100 pb-2">
+                            <span class="font-handwriting text-2xl text-rosepink-600 font-bold">Dearest Jaanu,</span>
+                        </div>
+                        
+                        <!-- EXACT LOVE LETTER MESSAGE (Appears instantly in full) -->
+                        <div class="text-xs text-gray-800 leading-relaxed font-normal space-y-2 min-h-[140px] max-h-[220px] overflow-y-auto pr-1" id="typedTextContainer">
+                            Happiesttt Birthday jaanu, may god bless you with everything you want and bless you with lots of happiness and give me you 😍, you dont have any idea how special you are to me and yk i feel rllyyyyyyyyy good even in your presence, and biceps dediya haa (biceps hai nehi, but stilll manage😔👆, anyways happy birthday again and have a great dayyyy, love you sooooo muchhhhhhh, mwahhhhhhhhhh🫶🫶🫶
+                        </div>
+
+                        <div class="text-right pt-2 border-t border-rosepink-100">
+                            <span class="text-[10px] text-gray-400">With endless love,</span>
+                            <p class="font-handwriting text-2xl text-rosepink-600 font-bold leading-none mt-0.5">
+                                Forever Yours ❤️
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Step 4 Action Button -->
+                <div class="w-full pb-3">
+                    <button id="step4NextBtn" onclick="goToStep(5)" class="w-full py-3.5 bg-gradient-to-r from-rosepink-500 to-rosepink-600 hover:from-rosepink-600 hover:to-rosepink-700 text-white font-bold rounded-2xl shadow-lg shadow-rosepink-500/30 flex items-center justify-center space-x-2 text-sm opacity-50 pointer-events-none transition-all">
+                        <span>Make A Wish 🎂</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+            </section>
+
+
+            <!-- ==========================================
+                 STEP 5: INTERACTIVE BIRTHDAY CAKE FINALE
+                 ========================================== -->
+            <section id="step-5" class="step-screen step-hidden-next absolute inset-0 p-5 flex flex-col items-center justify-between text-center">
+
+                <div class="space-y-1">
+                    <span class="px-3.5 py-1 rounded-full bg-rosepink-100 text-rosepink-600 text-xs font-semibold uppercase tracking-wider inline-block">
+                        Make A Wish 🎂
+                    </span>
+                    <h2 class="text-xl font-bold text-gray-900">Blow The Candles!</h2>
+                    <p class="text-xs text-gray-500">Tap flames, blow into mic, or use the blow button!</p>
+                </div>
+
+                <!-- ANIMATED BIRTHDAY CAKE -->
+                <div class="relative w-56 h-56 my-auto flex items-end justify-center">
+                    <svg class="w-full h-full drop-shadow-xl" viewBox="0 0 200 200" fill="none">
+                        <!-- Plate -->
+                        <ellipse cx="100" cy="180" rx="85" ry="10" fill="#E2E8F0" />
+                        <ellipse cx="100" cy="177" rx="80" ry="8" fill="#FFFFFF" />
+
+                        <!-- Bottom Layer -->
+                        <rect x="35" y="125" width="130" height="45" rx="8" fill="#F43F5E" />
+                        <path d="M35 135 C50 145, 60 125, 75 140 C90 150, 100 130, 115 140 C130 150, 140 130, 165 140 V125 H35 Z" fill="#FFF" />
+
+                        <!-- Top Layer -->
+                        <rect x="55" y="85" width="90" height="42" rx="6" fill="#FB7185" />
+                        <path d="M55 95 C65 105, 75 90, 85 100 C95 110, 105 92, 115 102 C125 112, 135 95, 145 102 V85 H55 Z" fill="#FFF" />
+
+                        <!-- Cherries -->
+                        <circle cx="65" cy="83" r="4.5" fill="#E11D48" />
+                        <circle cx="100" cy="83" r="4.5" fill="#E11D48" />
+                        <circle cx="135" cy="83" r="4.5" fill="#E11D48" />
+
+                        <!-- Candle Sticks -->
+                        <rect x="72" y="56" width="5" height="26" rx="2" fill="#FBBF24" />
+                        <rect x="97.5" y="52" width="5" height="30" rx="2" fill="#60A5FA" />
+                        <rect x="123" y="56" width="5" height="26" rx="2" fill="#F472B6" />
+                    </svg>
+
+                    <!-- Candle Flames Overlay -->
+                    <div id="candleContainer" class="absolute inset-0 pointer-events-auto">
+                        <!-- Flame 1 -->
+                        <div class="candle-flame absolute left-[72px] top-[38px] cursor-pointer" onclick="extinguishSingleCandle(this)">
+                            <div class="flame-inner w-3 h-4 rounded-full animate-flame"></div>
+                            <div class="smoke w-2 h-2 bg-gray-400 rounded-full mx-auto opacity-0 transition-all duration-700"></div>
+                        </div>
+
+                        <!-- Flame 2 -->
+                        <div class="candle-flame absolute left-[97.5px] top-[34px] cursor-pointer" onclick="extinguishSingleCandle(this)">
+                            <div class="flame-inner w-3 h-4 rounded-full animate-flame"></div>
+                            <div class="smoke w-2 h-2 bg-gray-400 rounded-full mx-auto opacity-0 transition-all duration-700"></div>
+                        </div>
+
+                        <!-- Flame 3 -->
+                        <div class="candle-flame absolute left-[123px] top-[38px] cursor-pointer" onclick="extinguishSingleCandle(this)">
+                            <div class="flame-inner w-3 h-4 rounded-full animate-flame"></div>
+                            <div class="smoke w-2 h-2 bg-gray-400 rounded-full mx-auto opacity-0 transition-all duration-700"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blow Controls & Final Banner -->
+                <div class="w-full space-y-3 pb-3">
+                    <div id="blowButtonsRow" class="flex items-center justify-center gap-2">
+                        <button onclick="blowAllCandles()" class="px-5 py-2.5 bg-rosepink-600 hover:bg-rosepink-700 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 shadow-md">
+                            <i data-lucide="wind" class="w-4 h-4"></i>
+                            <span>Blow Candles 🌬️</span>
+                        </button>
+                        <button id="micBtn" onclick="toggleMicBlow()" class="px-4 py-2.5 bg-white border border-rosepink-200 text-gray-700 rounded-xl text-xs font-semibold flex items-center space-x-1.5 shadow-sm">
+                            <i data-lucide="mic" class="w-4 h-4 text-rosepink-500"></i>
+                            <span id="micBtnText">Use Mic</span>
+                        </button>
+                    </div>
+
+                    <div id="finaleBanner" class="hidden glass-card rounded-2xl p-4 border border-rosepink-200 space-y-2 animate-pop-in">
+                        <h3 class="text-2xl font-bold font-cursive text-rosepink-600">
+                            🎉 Happy Birthday Jaanu! 🎉
+                        </h3>
+                        <p class="text-xs text-gray-700 font-medium">
+                            May your day be as beautiful, funny, and bright as you are! 💖
+                        </p>
+                        <button onclick="replaySurprise()" class="w-full mt-2 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs flex items-center justify-center space-x-1.5 shadow-md transition-all">
+                            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                            <span>Replay Surprise ↺</span>
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+
+        </div>
+    </main>
+
+    <!-- ==========================================
+         JAVASCRIPT STATE & STEP NAVIGATION LOGIC
+         ========================================== -->
+    <script>
+        lucide.createIcons();
+
+        // Application State Variables
+        let currentStep = 1;
+        const totalSteps = 5;
+        let viewedPolaroids = 0;
+        let isLetterOpen = false;
+        let candlesLeft = 3;
+
+        // EXACT LOVE LETTER MESSAGE
+        const fullLetterMessage = "Happiesttt Birthday jaanu, may god bless you with everything you want and bless you with lots of happiness and give me you 😍, you dont have any idea how special you are to me and yk i feel rllyyyyyyyyy good even in your presence, and biceps dediya haa (biceps hai nehi, but stilll manage😔👆, anyways happy birthday again and have a great dayyyy, love you sooooo muchhhhhhh, mwahhhhhhhhhh🫶🫶🫶";
+
+        // Setup Step Indicator Dots (5 steps total)
+        const stepDotsContainer = document.getElementById('stepDots');
+        for (let i = 1; i <= totalSteps; i++) {
+            const dot = document.createElement('div');
+            dot.id = `dot-${i}`;
+            dot.className = `w-2 h-2 rounded-full transition-all duration-300 ${i === 1 ? 'bg-rosepink-600 w-4' : 'bg-rosepink-200'}`;
+            stepDotsContainer.appendChild(dot);
+        }
+
+        // STEP NAVIGATION CONTROLLER
+        function goToStep(targetStep) {
+            if (targetStep < 1 || targetStep > totalSteps) return;
+
+            const currentElem = document.getElementById(`step-${currentStep}`);
+            const nextElem = document.getElementById(`step-${targetStep}`);
+
+            // Update Screen Animations
+            if (targetStep > currentStep) {
+                currentElem.className = "step-screen step-hidden-prev absolute inset-0 p-5 flex flex-col items-center justify-between text-center";
+                nextElem.className = "step-screen step-active absolute inset-0 p-5 flex flex-col items-center justify-between text-center";
+            } else {
+                currentElem.className = "step-screen step-hidden-next absolute inset-0 p-5 flex flex-col items-center justify-between text-center";
+                nextElem.className = "step-screen step-active absolute inset-0 p-5 flex flex-col items-center justify-between text-center";
+            }
+
+            // Update Progress Dots & Counter Text
+            for (let i = 1; i <= totalSteps; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i === targetStep) {
+                    dot.className = "w-4 h-2 rounded-full bg-rosepink-600 transition-all duration-300";
+                } else {
+                    dot.className = "w-2 h-2 rounded-full bg-rosepink-200 transition-all duration-300";
+                }
+            }
+
+            currentStep = targetStep;
+            document.getElementById('stepCounterText').innerText = `Step ${currentStep}/${totalSteps}`;
+
+            // Trigger Fireworks on final step
+            if (currentStep === 5 && candlesLeft <= 0) {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+        }
+
+
+        /* 1. GIFT UNBOXING LOGIC */
+        function openGift() {
+            const lid = document.getElementById('giftLid');
+            const box = document.getElementById('giftBox');
+            const success = document.getElementById('step1Success');
+
+            lid.style.transform = 'translateY(-30px) rotate(-12deg)';
+            box.classList.remove('animate-float');
+
+            confetti({ particleCount: 100, spread: 80, origin: { y: 0.5 } });
+
+            setTimeout(() => {
+                box.parentElement.style.display = 'none';
+                success.classList.remove('hidden');
+            }, 500);
+        }
+
+
+        /* 2. POLAROID STACK LOGIC */
+        function nextPolaroid(id) {
+            const card = document.getElementById(`polaroid-${id}`);
+            card.style.transform = 'translateX(130%) rotate(25deg)';
+            card.style.opacity = '0';
+            
+            viewedPolaroids++;
+
+            if (viewedPolaroids >= 3) {
+                const btn = document.getElementById('step2NextBtn');
+                btn.classList.remove('opacity-50', 'pointer-events-none');
+                document.getElementById('step2BtnText').innerText = "See Bicep Heart 💪 →";
+            }
+        }
+
+
+        /* 3. LOVE LETTER LOGIC */
+        function openLetter() {
+            if (isLetterOpen) return;
+            isLetterOpen = true;
+
+            document.getElementById('envelopeWrapper').classList.add('hidden');
+            const card = document.getElementById('letterCard');
+            card.classList.remove('hidden');
+
+            confetti({ particleCount: 60, spread: 60, origin: { y: 0.6 } });
+
+            // Enable next button immediately
+            const btn = document.getElementById('step4NextBtn');
+            btn.classList.remove('opacity-50', 'pointer-events-none');
+        }
+
+
+        /* 4. CAKE CANDLE BLOWING LOGIC */
+        function extinguishSingleCandle(elem) {
+            if (!elem.classList.contains('blown-out')) {
+                elem.classList.add('blown-out');
+                candlesLeft--;
+                checkCandles();
+            }
+        }
+
+        function blowAllCandles() {
+            const flames = document.querySelectorAll('.candle-flame');
+            flames.forEach(f => f.classList.add('blown-out'));
+            candlesLeft = 0;
+            checkCandles();
+        }
+
+        function checkCandles() {
+            if (candlesLeft <= 0) {
+                confetti({ particleCount: 140, spread: 90, origin: { y: 0.5 } });
+                document.getElementById('blowButtonsRow').classList.add('hidden');
+                document.getElementById('finaleBanner').classList.remove('hidden');
+            }
+        }
+
+        let isListeningMic = false;
+        let micStream;
+        async function toggleMicBlow() {
+            const btnText = document.getElementById('micBtnText');
+            if (isListeningMic) {
+                if (micStream) micStream.getTracks().forEach(t => t.stop());
+                isListeningMic = false;
+                btnText.innerText = "Use Mic";
+                return;
+            }
+
+            try {
+                micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const analyser = audioCtx.createAnalyser();
+                const source = audioCtx.createMediaStreamSource(micStream);
+                source.connect(analyser);
+                analyser.fftSize = 256;
+                const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+                isListeningMic = true;
+                btnText.innerText = "Blow now! 🌬️";
+
+                function checkVolume() {
+                    if (!isListeningMic) return;
+                    analyser.getByteFrequencyData(dataArray);
+                    let sum = 0;
+                    for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+                    let avg = sum / dataArray.length;
+
+                    if (avg > 60) {
+                        blowAllCandles();
+                        micStream.getTracks().forEach(t => t.stop());
+                        isListeningMic = false;
+                        btnText.innerText = "Blown! 🎉";
+                    } else {
+                        requestAnimationFrame(checkVolume);
+                    }
+                }
+                checkVolume();
+            } catch (err) {
+                const statusEl = document.getElementById('micBtnText');
+                if (statusEl) statusEl.innerText = "Tap flame / Blow btn";
+            }
+        }
+
+        function replaySurprise() {
+            location.reload();
+        }
+
+
+        /* ==========================================
+           5. WEB AUDIO SYNTH MUSIC BOX ("Happy Birthday")
+           ========================================== */
+        class BirthdayMusicBox {
+            constructor() {
+                this.audioCtx = null;
+                this.isPlaying = false;
+                this.timer = null;
+            }
+
+            init() {
+                if (!this.audioCtx) {
+                    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            playNote(freq, duration) {
+                if (!this.audioCtx || !this.isPlaying) return;
+
+                const osc = this.audioCtx.createOscillator();
+                const gain = this.audioCtx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, this.audioCtx.currentTime);
+
+                gain.gain.setValueAtTime(0.2, this.audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, this.audioCtx.currentTime + duration);
+
+                osc.connect(gain);
+                gain.connect(this.audioCtx.destination);
+
+                osc.start();
+                osc.stop(this.audioCtx.currentTime + duration);
+            }
+
+            playMelody() {
+                const notes = [
+                    { f: 261.63, d: 0.4 }, { f: 261.63, d: 0.4 }, { f: 293.66, d: 0.8 }, { f: 261.63, d: 0.8 }, { f: 349.23, d: 0.8 }, { f: 329.63, d: 1.2 },
+                    { f: 261.63, d: 0.4 }, { f: 261.63, d: 0.4 }, { f: 293.66, d: 0.8 }, { f: 261.63, d: 0.8 }, { f: 392.00, d: 0.8 }, { f: 349.23, d: 1.2 },
+                    { f: 261.63, d: 0.4 }, { f: 261.63, d: 0.4 }, { f: 523.25, d: 0.8 }, { f: 440.00, d: 0.8 }, { f: 349.23, d: 0.8 }, { f: 329.63, d: 0.8 }, { f: 293.66, d: 0.8 },
+                    { f: 466.16, d: 0.4 }, { f: 466.16, d: 0.4 }, { f: 440.00, d: 0.8 }, { f: 349.23, d: 0.8 }, { f: 392.00, d: 0.8 }, { f: 349.23, d: 1.4 }
+                ];
+
+                let idx = 0;
+                const schedule = () => {
+                    if (!this.isPlaying) return;
+                    const n = notes[idx];
+                    this.playNote(n.f, n.d);
+                    idx = (idx + 1) % notes.length;
+                    this.timer = setTimeout(schedule, n.d * 850);
+                };
+                schedule();
+            }
+
+            toggle() {
+                this.init();
+                if (this.audioCtx.state === 'suspended') this.audioCtx.resume();
+                this.isPlaying = !this.isPlaying;
+                if (this.isPlaying) this.playMelody();
+                else clearTimeout(this.timer);
+                return this.isPlaying;
+            }
+        }
+
+        const musicBox = new BirthdayMusicBox();
+        function toggleMusic() {
+            const playing = musicBox.toggle();
+            document.getElementById('musicStatusText').innerText = playing ? "Playing 🎵" : "Music";
+            document.getElementById('musicIcon').className = playing ? "w-3.5 h-3.5 text-rosepink-500 animate-spin" : "w-3.5 h-3.5 text-rosepink-500";
+        }
+
+        /* Floating background hearts canvas */
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const floatingHearts = Array.from({ length: 22 }, () => ({
+            x: Math.random() * canvas.width,
+            y: canvas.height + Math.random() * 40,
+            size: Math.random() * 10 + 6,
+            speedY: Math.random() * 1 + 0.4,
+            opacity: Math.random() * 0.4 + 0.2
+        }));
+
+        function drawHearts() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            floatingHearts.forEach(h => {
+                h.y -= h.speedY;
+                if (h.y < -20) { h.y = canvas.height + 20; h.x = Math.random() * canvas.width; }
+                ctx.fillStyle = `rgba(244, 63, 94, ${h.opacity})`;
+                ctx.beginPath();
+                ctx.arc(h.x, h.y, h.size / 2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            requestAnimationFrame(drawHearts);
+        }
+        drawHearts();
+    </script>
+</body>
+</html>
