@@ -214,7 +214,7 @@
                     </div>
 
                     <button onclick="goToStep(2)" class="w-full py-3.5 bg-gradient-to-r from-rosepink-500 to-rosepink-600 hover:from-rosepink-600 hover:to-rosepink-700 text-white font-bold rounded-2xl shadow-lg shadow-rosepink-500/30 flex items-center justify-center space-x-2 text-sm active:scale-98 transition-all">
-                        <span>See Your Photos 📸</span>
+                        <span>See Our Photos 📸</span>
                         <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -245,7 +245,7 @@
                             <span class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full backdrop-blur-sm">3 of 3</span>
                         </div>
                         <div class="pt-2.5 text-center">
-                            <h3 class="font-polaroid text-2xl font-bold text-gray-800 leading-tight">That smileeee 😍🫶</h3>
+                            <h3 class="font-polaroid text-2xl font-bold text-gray-800 leading-tight">That smile & nathni though 😍🫶</h3>
                         </div>
                     </div>
 
@@ -300,10 +300,9 @@
 
                 <!-- Reserved Photo Slot for Bicep Heart Link -->
                 <div class="w-full max-w-[330px] h-[360px] my-auto glass-card rounded-2xl p-4 border-2 border-dashed border-rosepink-300 flex flex-col items-center justify-center space-y-3 shadow-lg">
-                    <!-- Replace src below with your bicep heart image link when ready -->
-                    <img id="bicepHeartPhoto" src=""C:\Users\Aryan\Downloads\WhatsApp Image 2026-11-22 at 4.29.09 PM.jpeg"" alt="Bicep Heart Photo" class="hidden w-full h-full object-contain rounded-xl" onload="this.classList.remove('hidden'); document.getElementById('bicepPlaceholderContent').classList.add('hidden');" onerror="this.classList.add('hidden'); document.getElementById('bicepPlaceholderContent').classList.remove('hidden');">
+                    <img id="bicepHeartPhoto" src="WhatsApp%20Image%202026-11-22%20at%204.29.09%20PM.jpeg" alt="Bicep Heart Photo" class="w-full h-full object-contain rounded-xl" onload="this.classList.remove('hidden'); document.getElementById('bicepPlaceholderContent').classList.add('hidden');" onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src='WhatsApp Image 2026-11-22 at 4.29.09 PM.jpg';}else if(this.dataset.tried==='1'){this.dataset.tried='2';this.src='WhatsApp Image 2026-11-22 at 4.29.09 PM';}else{this.classList.add('hidden'); document.getElementById('bicepPlaceholderContent').classList.remove('hidden');}">
 
-                    <div id="bicepPlaceholderContent" class="flex flex-col items-center justify-center space-y-2.5 px-3">
+                    <div id="bicepPlaceholderContent" class="hidden flex flex-col items-center justify-center space-y-2.5 px-3">
                         <div class="w-16 h-16 rounded-full bg-rosepink-100 text-rosepink-600 flex items-center justify-center shadow-sm">
                             <i data-lucide="heart-handshake" class="w-8 h-8"></i>
                         </div>
